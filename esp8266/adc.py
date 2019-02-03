@@ -6,13 +6,20 @@ from machine import ADC
 
 def get_raw():
     adc = ADC(0)
-    off = 0
     t = 0
 
-    for x in range(10):
-        t += (adc.read())
+    t += (adc.read())
+    t += (adc.read())
+    t += (adc.read())
+    t += (adc.read())
+    t += (adc.read())
+    t += (adc.read())
+    t += (adc.read())
+    t += (adc.read())
+    t += (adc.read())
+    t += (adc.read())
 
-    return (t/10) + off
+    return t/10
 
 
 def get_volts():
