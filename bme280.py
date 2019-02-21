@@ -3,6 +3,8 @@
 #
 # Updated from https://bitbucket.org/oscarBravo/wipy_bme280 to address changes in micropython.
 #
+# This was tested on an ESP32 build.
+#
 #
 # Author: Paul Cunnane 2016
 #
@@ -105,26 +107,26 @@ class Device:
     def writeRaw8(self, value):
         """Write an 8-bit value on the bus (without register)."""
         value = value & 0xFF
-        self._i2c.writeto(self._address, value)
+        self._i2c.writeto(self._address, bytearray([value]))
 
     def write8(self, register, value):
         """Write an 8-bit value to the specified register."""
         value = value & 0xFF
-        self._i2c.writeto_mem(self._address, register, value)
+        self._i2c.writeto_mem(self._address, register, bytearray([value]))
 
     def write16(self, register, value):
         """Write a 16-bit value to the specified register."""
         value = value & 0xFFFF
-        self.i2c.writeto_mem(self._address, register, value)
+        self.i2c.writeto_mem(self._address, register, bytearray([value]))
 
     def readRaw8(self):
         """Read an 8-bit value on the bus (without register)."""
-        return int.from_bytes(self._i2c.readfrom(self._address, 1)) & 0xFF
+        return int.from_bytes(self._i2c.readfrom(self._address, 1),'little')
 
     def readU8(self, register):
         """Read an unsigned byte from the specified register."""
         return int.from_bytes(
-            self._i2c.readfrom_mem(self._address, register, 1)) & 0xFF
+            self._i2c.readfrom_mem(self._address, register, 1),'little')
 
     def readS8(self, register):
         """Read a signed byte from the specified register."""
@@ -133,21 +135,17 @@ class Device:
             result -= 256
         return result
 
-    def readU16(self, register, little_endian=True):
+    def readU16(self, register, endian='little'):
         """Read an unsigned 16-bit value from the specified register, with the
         specified endianness (default little endian, or least significant byte
         first)."""
-        result = int.from_bytes(
-            self._i2c.readfrom_mem(self._address, register, 2)) & 0xFFFF
-        if not little_endian:
-            result = ((result << 8) & 0xFF00) + (result >> 8)
-        return result
+        return int.from_bytes(self._i2c.readfrom_mem(self._address, register, 2),endian)
 
-    def readS16(self, register, little_endian=True):
+    def readS16(self, register, endian='little'):
         """Read a signed 16-bit value from the specified register, with the
         specified endianness (default little endian, or least significant byte
         first)."""
-        result = self.readU16(register, little_endian)
+        result = self.readU16(register, endian)
         if result > 32767:
             result -= 65536
         return result
@@ -155,22 +153,22 @@ class Device:
     def readU16LE(self, register):
         """Read an unsigned 16-bit value from the specified register, in little
         endian byte order."""
-        return self.readU16(register, little_endian=True)
+        return self.readU16(register, endian='little')
 
     def readU16BE(self, register):
         """Read an unsigned 16-bit value from the specified register, in big
         endian byte order."""
-        return self.readU16(register, little_endian=False)
+        return self.readU16(register, endian='big')
 
     def readS16LE(self, register):
         """Read a signed 16-bit value from the specified register, in little
         endian byte order."""
-        return self.readS16(register, little_endian=True)
+        return self.readS16(register, endian='little')
 
     def readS16BE(self, register):
         """Read a signed 16-bit value from the specified register, in big
         endian byte order."""
-        return self.readS16(register, little_endian=False)
+        return self.readS16(register, endian='big')
 
 
 class BME280:
