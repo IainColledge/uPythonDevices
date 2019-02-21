@@ -9,3 +9,4 @@ A small library of micropython devices.
 ## Generic 
 
 * [LM35](http://www.ti.com/lit/ds/symlink/lm35.pdf) one wire temp sensor, hook up to the ADC.
+* [Adafruit BM280](https://www.adafruit.com/product/2652) I2C Temperature Humidity Pressure Sensor.
